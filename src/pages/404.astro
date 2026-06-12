@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout
+  title="Page not found — Savely"
+  description="The page you are looking for does not exist."
+>
+  <Header />
+  <main class="not-found">
+    <div class="container">
+      <span class="not-found-code">404</span>
+      <h1 class="not-found-title">Page not found</h1>
+      <p class="not-found-sub">The page you're looking for doesn't exist or was moved.</p>
+      <a href="/" class="btn-primary">Back to home</a>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .not-found {
+    padding-top: 10rem;
+    padding-bottom: 4rem;
+    min-height: 90dvh;
+    display: flex;
+    align-items: center;
+  }
+
+  .not-found-code {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-orange);
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .not-found-title {
+    font-family: var(--font-body);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+  }
+
+  .not-found-sub {
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin-bottom: 2rem;
+  }
+</style>

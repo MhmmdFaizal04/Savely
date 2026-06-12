@@ -1,0 +1,142 @@
+---
+---
+<header id="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label="Savely home">savely</a>
+    <nav aria-label="Main navigation">
+      <ul>
+        <li><a href="/download" class="nav-link">Download</a></li>
+        <li><a href="/faq" class="nav-link">FAQ</a></li>
+        <li>
+          <a href="/download" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.875rem;">
+            Start Saving
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a href="/download" class="mobile-nav-link">Download</a>
+    <a href="/faq" class="mobile-nav-link">FAQ</a>
+  </div>
+</header>
+
+<style>
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: rgba(13, 13, 13, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    transition: transform 0.3s ease;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+    letter-spacing: -0.02em;
+  }
+  .logo:hover { color: var(--color-orange); }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-link {
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--color-white); }
+
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-white);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  .mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease;
+  }
+  .mobile-nav.open { max-height: 200px; }
+
+  .mobile-nav-link {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+    transition: color 0.2s;
+  }
+  .mobile-nav-link:hover { color: var(--color-white); }
+
+  @media (max-width: 640px) {
+    nav { display: none; }
+    .menu-toggle { display: flex; }
+    .mobile-nav { display: flex; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  // Scroll-hide / reveal header
+  let lastY = 0;
+  const header = document.getElementById('site-header')!;
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y > 80 && y > lastY) {
+      gsap.to(header, { y: -80, duration: 0.35, ease: 'power2.out' });
+    } else {
+      gsap.to(header, { y: 0, duration: 0.35, ease: 'power2.out' });
+    }
+    lastY = y;
+  }, { passive: true });
+
+  // Mobile menu toggle
+  const toggle = document.getElementById('menu-toggle')!;
+  const mobileNav = document.getElementById('mobile-nav')!;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    mobileNav.setAttribute('aria-hidden', String(!isOpen));
+  });
+</script>

@@ -1,0 +1,71 @@
+---
+const platforms = [
+  { name: 'YouTube', tag: 'YT' },
+  { name: 'TikTok', tag: 'TK' },
+  { name: 'Instagram', tag: 'IG' },
+  { name: 'Facebook', tag: 'FB' },
+];
+---
+<section class="platforms">
+  <div class="container">
+    <p class="platforms-label">Works with</p>
+    <ul class="platforms-list">
+      {platforms.map(({ name, tag }) => (
+        <li class="platform-item" data-tag={tag}>
+          <span class="platform-badge platform-badge--lg">{name}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .platforms {
+    padding-block: 3rem;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .platforms-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .platforms-list {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .platform-item {}
+
+  .platform-badge--lg {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.set('.platform-item', { opacity: 0, y: 16 });
+
+  gsap.to('.platform-item', {
+    opacity: 1,
+    y: 0,
+    duration: 0.6,
+    stagger: 0.12,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.platforms',
+      start: 'top 80%',
+    },
+  });
+</script>

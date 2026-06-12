@@ -1,0 +1,135 @@
+---
+---
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-label">
+      <span class="platform-badge">savely</span>
+    </div>
+    <h1 class="hero-title">
+      <span class="hero-line" aria-hidden="true">Save videos</span>
+      <span class="hero-line" aria-hidden="true">from anywhere,</span>
+      <span class="hero-line hero-line--accent" aria-hidden="true">instantly.</span>
+      <span class="sr-only">Save videos from anywhere, instantly.</span>
+    </h1>
+    <p class="hero-sub">
+      Paste a link from Instagram, TikTok, YouTube, or Facebook<br />
+      and download it in seconds. No accounts. No fees.
+    </p>
+    <div class="hero-actions">
+      <a href="/download" class="btn-primary hero-cta">Start Saving</a>
+      <a href="#how" class="btn-ghost">How it works</a>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: 10rem;
+    padding-bottom: 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle radial glow behind the title */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(255, 140, 66, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.75rem;
+    position: relative;
+  }
+
+  .hero-label { margin-bottom: 0.5rem; }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-line {
+    display: block;
+  }
+
+  .hero-line--accent { color: var(--color-orange); }
+
+  .hero-sub {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.75vw, 1.125rem);
+    color: var(--color-muted);
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: -3rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--color-orange), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.15); }
+  }
+
+  @media (max-width: 640px) {
+    .hero { padding-top: 8rem; padding-bottom: 4rem; }
+    .hero-inner { align-items: center; text-align: center; }
+    .hero-sub { max-width: 100%; }
+    .hero-actions { justify-content: center; }
+    .hero-scroll { display: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  // Set initial hidden state via JS — elements are visible without JS
+  gsap.set('.hero-line', { opacity: 0, y: 24 });
+  gsap.set('.hero-sub', { opacity: 0 });
+  gsap.set('.hero-actions', { opacity: 0 });
+  gsap.set('.hero-scroll', { opacity: 0 });
+
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  tl.to('.hero-line', { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, delay: 0.15 })
+    .to('.hero-sub', { opacity: 1, duration: 0.6 }, '-=0.3')
+    .to('.hero-actions', { opacity: 1, duration: 0.5 }, '-=0.25')
+    .to('.hero-scroll', { opacity: 1, duration: 0.5 }, '-=0.2');
+</script>

@@ -1,0 +1,82 @@
+---
+---
+<footer>
+  <div class="container footer-inner">
+    <a href="/" class="footer-logo">savely</a>
+    <p class="footer-tagline">Download videos. Keep what matters.</p>
+    <div class="footer-platforms">
+      <span>YouTube</span>
+      <span>TikTok</span>
+      <span>Instagram</span>
+      <span>Facebook</span>
+    </div>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="/download">Download</a>
+      <a href="/faq">FAQ</a>
+    </nav>
+    <p class="footer-copy">
+      &copy; {new Date().getFullYear()} Savely. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--color-border);
+    padding-block: 3rem;
+    margin-top: 6rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+    letter-spacing: -0.02em;
+  }
+  .footer-logo:hover { color: var(--color-orange); }
+
+  .footer-tagline {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+
+  .footer-platforms {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .footer-platforms span {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .footer-nav {
+    display: flex;
+    gap: 1.75rem;
+  }
+  .footer-nav a {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    transition: color 0.2s;
+  }
+  .footer-nav a:hover { color: var(--color-white); }
+
+  .footer-copy {
+    font-size: 0.8125rem;
+    color: var(--color-border);
+    margin-top: 0.5rem;
+  }
+</style>

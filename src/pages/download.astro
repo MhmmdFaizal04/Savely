@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import DownloadForm from '../components/DownloadForm.astro';
+---
+<Layout
+  title="Download — Savely"
+  description="Paste a video link from Instagram, TikTok, YouTube, or Facebook and download it instantly."
+>
+  <Header />
+  <main class="download-page">
+    <div class="container download-container">
+      <div class="download-header">
+        <span class="section-label">Download</span>
+        <h1 class="download-title">Paste a video link</h1>
+        <p class="download-sub">
+          Works with Instagram, TikTok, YouTube, and Facebook.
+        </p>
+      </div>
+      <DownloadForm />
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .download-page {
+    padding-top: 10rem;
+    padding-bottom: 4rem;
+    min-height: 90dvh;
+  }
+
+  .download-container {
+    max-width: 680px;
+  }
+
+  .download-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .download-title {
+    font-family: var(--font-body);
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+  }
+
+  .download-sub {
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+</style>

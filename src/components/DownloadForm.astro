@@ -1,0 +1,453 @@
+---
+---
+<div class="download-form-wrap" id="download-form-wrap">
+  <!-- Platform indicator -->
+  <div class="platform-indicator" id="platform-indicator" aria-live="polite">
+    <span class="pi-dot" id="pi-dot"></span>
+    <span class="pi-text" id="pi-text">Paste a link to detect the platform</span>
+  </div>
+
+  <!-- Input form -->
+  <form id="download-form" novalidate>
+    <div class="input-row" id="input-row">
+      <input
+        id="url-input"
+        type="url"
+        name="url"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="https://www.tiktok.com/@user/video/..."
+        aria-label="Video URL"
+        required
+      />
+      <button type="submit" class="btn-primary" id="submit-btn" aria-label="Download video">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 2v8M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span id="btn-text">Download</span>
+      </button>
+    </div>
+    <div class="input-error" id="input-error" role="alert" aria-live="assertive"></div>
+  </form>
+
+  <!-- Loading state -->
+  <div class="loading-state" id="loading-state" hidden aria-live="polite">
+    <div class="loading-bar">
+      <div class="loading-fill" id="loading-fill"></div>
+    </div>
+    <p class="loading-text">Fetching your video...</p>
+  </div>
+
+  <!-- Result card -->
+  <div class="result-card card" id="result-card" hidden>
+    <div class="result-inner">
+      <!-- Thumbnail -->
+      <div class="result-thumb-wrap" id="result-thumb-wrap">
+        <img id="result-thumb" src="" alt="Video thumbnail" class="result-thumb" />
+        <div class="result-platform-pill" id="result-platform-pill">
+          <span id="result-platform"></span>
+          <span class="result-quality-dot" aria-hidden="true"></span>
+          <span id="result-quality"></span>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="result-info">
+        <p class="result-label">Ready to save</p>
+        <p class="result-title" id="result-title"></p>
+        <div class="result-actions">
+          <a
+            id="result-link"
+            href="#"
+            class="btn-primary result-download"
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M8 2v8M4 8l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 13h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            Save Video
+          </a>
+          <button class="btn-ghost result-reset" id="result-reset">Try another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .download-form-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Platform indicator */
+  .platform-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+    min-height: 1.5rem;
+  }
+
+  .pi-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+  }
+
+  .pi-dot.detected { background: var(--color-orange); }
+
+  /* Input row */
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-row:focus-within {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.12);
+  }
+
+  #url-input {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--color-white);
+    background: transparent;
+    min-width: 0;
+  }
+
+  #url-input::placeholder { color: var(--color-muted); }
+
+  #submit-btn {
+    flex-shrink: 0;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  /* Error */
+  .input-error {
+    font-size: 0.875rem;
+    color: #FF6B6B;
+    font-family: var(--font-mono);
+    min-height: 1.25rem;
+    padding-left: 0.25rem;
+  }
+
+  /* Loading */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .loading-bar {
+    height: 2px;
+    background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .loading-fill {
+    height: 100%;
+    background: var(--color-orange);
+    width: 0%;
+    border-radius: 2px;
+  }
+
+  .loading-text {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  /* Result card */
+  .result-card {
+    opacity: 0;
+    transform: translateY(16px);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .result-inner {
+    display: flex;
+    gap: 0;
+  }
+
+  /* Thumbnail — left column */
+  .result-thumb-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 160px;
+    min-height: 160px;
+    display: none;
+    background: var(--color-border);
+  }
+  .result-thumb-wrap.has-thumb { display: block; }
+
+  .result-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    min-height: 160px;
+  }
+
+  /* Platform + quality pill overlaid on thumbnail */
+  .result-platform-pill {
+    position: absolute;
+    bottom: 0.625rem;
+    left: 0.625rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(13, 13, 13, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-white);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .result-quality-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    opacity: 0.8;
+  }
+
+  /* Info — right column */
+  .result-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.5rem 1.75rem;
+    min-width: 0;
+  }
+
+  /* When no thumbnail — info fills full width */
+  .result-thumb-wrap:not(.has-thumb) + .result-info {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .result-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+  }
+
+  .result-title {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-white);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  .result-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+
+  .result-download {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .result-reset {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 480px) {
+    .result-thumb-wrap { width: 120px; min-height: 120px; }
+    .result-info { padding: 1.125rem; }
+    .result-title { font-size: 0.9375rem; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { detectPlatform, isValidUrl } from '../lib/detect.js';
+
+  const PLATFORM_LABELS: Record<string, string> = {
+    youtube: 'YouTube',
+    tiktok: 'TikTok',
+    instagram: 'Instagram',
+    facebook: 'Facebook',
+  };
+
+  const form = document.getElementById('download-form') as HTMLFormElement;
+  const input = document.getElementById('url-input') as HTMLInputElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const btnText = document.getElementById('btn-text') as HTMLSpanElement;
+  const errorEl = document.getElementById('input-error') as HTMLDivElement;
+  const loadingEl = document.getElementById('loading-state') as HTMLDivElement;
+  const loadingFill = document.getElementById('loading-fill') as HTMLDivElement;
+  const resultCard = document.getElementById('result-card') as HTMLDivElement;
+  const resultLink = document.getElementById('result-link') as HTMLAnchorElement;
+  const resultTitle = document.getElementById('result-title') as HTMLParagraphElement;
+  const resultPlatform = document.getElementById('result-platform') as HTMLSpanElement;
+  const resultQuality = document.getElementById('result-quality') as HTMLSpanElement;
+  const resultThumbWrap = document.getElementById('result-thumb-wrap') as HTMLDivElement;
+  const resultThumb = document.getElementById('result-thumb') as HTMLImageElement;
+  const resetBtn = document.getElementById('result-reset') as HTMLButtonElement;
+  const piDot = document.getElementById('pi-dot') as HTMLSpanElement;
+  const piText = document.getElementById('pi-text') as HTMLSpanElement;
+
+  // Platform detection on input
+  input.addEventListener('input', () => {
+    const val = input.value.trim();
+    if (!val) {
+      piDot.classList.remove('detected');
+      piText.textContent = 'Paste a link to detect the platform';
+      return;
+    }
+    const platform = detectPlatform(val);
+    if (platform) {
+      piDot.classList.add('detected');
+      piText.textContent = PLATFORM_LABELS[platform] + ' detected';
+    } else {
+      piDot.classList.remove('detected');
+      piText.textContent = isValidUrl(val) ? 'Platform not supported' : 'Paste a link to detect the platform';
+    }
+  });
+
+  function setError(msg: string) {
+    errorEl.textContent = msg;
+    gsap.fromTo(
+      '#input-row',
+      { x: -8 },
+      { x: 0, duration: 0.4, ease: 'elastic.out(1, 0.4)', clearProps: 'x' },
+    );
+  }
+
+  function clearError() { errorEl.textContent = ''; }
+
+  function showLoading() {
+    loadingEl.hidden = false;
+    gsap.fromTo(loadingFill, { width: '0%' }, { width: '75%', duration: 1.8, ease: 'power1.inOut' });
+  }
+
+  function hideLoading() {
+    gsap.to(loadingFill, {
+      width: '100%',
+      duration: 0.3,
+      ease: 'power2.out',
+      onComplete: () => { loadingEl.hidden = true; },
+    });
+  }
+
+  function showResult(data: { title: string; url: string; platform: string; quality: string; thumbnail?: string }) {
+    resultTitle.textContent = data.title;
+    resultLink.href = data.url;
+    resultPlatform.textContent = PLATFORM_LABELS[data.platform] ?? data.platform;
+    resultQuality.textContent = data.quality;
+
+    if (data.thumbnail) {
+      resultThumb.src = data.thumbnail;
+      resultThumb.alt = data.title;
+      resultThumbWrap.classList.add('has-thumb');
+    } else {
+      resultThumbWrap.classList.remove('has-thumb');
+    }
+
+    gsap.set(resultCard, { opacity: 0, y: 16 });
+    resultCard.hidden = false;
+    gsap.to(resultCard, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' });
+  }
+
+  function resetForm() {
+    gsap.to(resultCard, {
+      opacity: 0,
+      y: 16,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: () => { resultCard.hidden = true; },
+    });
+    input.value = '';
+    piDot.classList.remove('detected');
+    piText.textContent = 'Paste a link to detect the platform';
+    clearError();
+    input.focus();
+  }
+
+  resetBtn.addEventListener('click', resetForm);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const url = input.value.trim();
+    if (!url) { setError('Please paste a video URL.'); return; }
+    if (!isValidUrl(url)) { setError('URL must start with http:// or https://'); return; }
+    if (!detectPlatform(url)) {
+      setError('Unsupported platform. Use a YouTube, TikTok, Instagram, or Facebook link.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'Fetching...';
+    showLoading();
+    resultCard.hidden = true;
+
+    try {
+      const res = await fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await res.json() as { error?: string; title?: string; url?: string; platform?: string; quality?: string; thumbnail?: string };
+
+      if (!res.ok || data.error) {
+        hideLoading();
+        setError(data.error ?? 'Something went wrong. Please try again.');
+        return;
+      }
+
+      hideLoading();
+      showResult(data as { title: string; url: string; platform: string; quality: string; thumbnail?: string });
+    } catch {
+      hideLoading();
+      setError('Network error — please check your connection and try again.');
+    } finally {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Download';
+    }
+  });
+</script>

@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FaqAccordion from '../components/FaqAccordion.astro';
+---
+<Layout
+  title="FAQ — Savely"
+  description="Frequently asked questions about Savely — the free video downloader for Instagram, TikTok, YouTube, and Facebook."
+>
+  <Header />
+  <main class="faq-page">
+    <div class="container faq-container">
+      <div class="faq-header">
+        <span class="section-label">FAQ</span>
+        <h1 class="faq-title">Frequently asked questions</h1>
+        <p class="faq-sub">
+          Can't find what you're looking for?
+          <a href="mailto:hello@savely.app" class="faq-contact">Get in touch.</a>
+        </p>
+      </div>
+      <FaqAccordion />
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .faq-page {
+    padding-top: 10rem;
+    padding-bottom: 4rem;
+    min-height: 90dvh;
+  }
+
+  .faq-container {
+    max-width: 720px;
+  }
+
+  .faq-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .faq-title {
+    font-family: var(--font-body);
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.75rem;
+  }
+
+  .faq-sub {
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+
+  .faq-contact {
+    color: var(--color-orange);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s;
+  }
+  .faq-contact:hover { opacity: 0.75; }
+</style>

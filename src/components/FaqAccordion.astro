@@ -1,0 +1,173 @@
+---
+const faqs = [
+  {
+    q: 'Which platforms does Savely support?',
+    a: 'Savely currently supports YouTube (including Shorts), TikTok, public Instagram posts and Reels, and public Facebook videos.',
+  },
+  {
+    q: 'Is Savely free to use?',
+    a: 'Yes. Savely is completely free. There are no premium plans, no download limits, and no sign-up required.',
+  },
+  {
+    q: 'Why does Instagram say it cannot extract the video?',
+    a: 'Savely can only access public Instagram posts. Private accounts, age-restricted posts, or Stories cannot be downloaded.',
+  },
+  {
+    q: 'Why does TikTok or Facebook extraction sometimes fail?',
+    a: 'These platforms update their page structure occasionally, which can break the parser. If you encounter an error, try again in a few minutes or report the issue.',
+  },
+  {
+    q: 'Does Savely store my downloaded videos?',
+    a: 'No. Savely acts as a link resolver. The download goes directly from the platform\'s servers to your device. Nothing is stored on our end.',
+  },
+  {
+    q: 'Is downloading videos legal?',
+    a: 'Downloading videos for personal, offline use is generally acceptable, but redistributing or republishing downloaded content may violate the original platform\'s terms of service and copyright laws. Always respect the content creator\'s rights.',
+  },
+  {
+    q: 'Can I download videos on my phone?',
+    a: 'Yes. Savely works in any modern mobile browser. On iOS, you may need to use the "Save to Files" option instead of direct download.',
+  },
+];
+---
+<div class="faq-list" id="faq-list">
+  {faqs.map(({ q, a }, i) => (
+    <div class="faq-item" data-index={i}>
+      <button
+        class="faq-question"
+        aria-expanded="false"
+        aria-controls={`faq-answer-${i}`}
+      >
+        <span>{q}</span>
+        <span class="faq-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      <div
+        class="faq-answer"
+        id={`faq-answer-${i}`}
+        role="region"
+        aria-hidden="true"
+      >
+        <p class="faq-body">{a}</p>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+  .faq-item:last-child { border-bottom: none; }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1.375rem 1.75rem;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-white);
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 1rem;
+  }
+  .faq-question:hover { background: rgba(255, 255, 255, 0.03); }
+  .faq-question[aria-expanded="true"] { color: var(--color-orange); }
+
+  .faq-icon {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    transition: transform 0.3s ease;
+  }
+  .faq-question[aria-expanded="true"] .faq-icon {
+    transform: rotate(180deg);
+    color: var(--color-orange);
+  }
+
+  .faq-answer {
+    overflow: hidden;
+    height: 0;
+    background: var(--color-surface);
+  }
+  .faq-answer[aria-hidden="false"] { height: auto; }
+
+  .faq-body {
+    padding: 0 1.75rem 1.375rem;
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Stagger reveal on scroll
+  gsap.set('.faq-item', { opacity: 0, y: 12 });
+  gsap.to('.faq-item', {
+    opacity: 1,
+    y: 0,
+    duration: 0.5,
+    stagger: 0.08,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#faq-list',
+      start: 'top 80%',
+    },
+  });
+
+  // Accordion
+  const items = document.querySelectorAll<HTMLDivElement>('.faq-item');
+
+  items.forEach((item) => {
+    const btn = item.querySelector<HTMLButtonElement>('.faq-question')!;
+    const answer = item.querySelector<HTMLDivElement>('.faq-answer')!;
+    const body = answer.querySelector<HTMLParagraphElement>('.faq-body')!;
+
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+      // Close all others
+      items.forEach((other) => {
+        if (other === item) return;
+        const ob = other.querySelector<HTMLButtonElement>('.faq-question')!;
+        const oa = other.querySelector<HTMLDivElement>('.faq-answer')!;
+        if (ob.getAttribute('aria-expanded') === 'true') {
+          ob.setAttribute('aria-expanded', 'false');
+          oa.setAttribute('aria-hidden', 'true');
+          gsap.to(oa, { height: 0, duration: 0.35, ease: 'power2.in' });
+        }
+      });
+
+      if (isOpen) {
+        btn.setAttribute('aria-expanded', 'false');
+        answer.setAttribute('aria-hidden', 'true');
+        gsap.to(answer, { height: 0, duration: 0.35, ease: 'power2.in' });
+      } else {
+        btn.setAttribute('aria-expanded', 'true');
+        answer.setAttribute('aria-hidden', 'false');
+        const targetH = body.offsetHeight + 22; // paddingBottom
+        gsap.fromTo(answer, { height: 0 }, { height: targetH, duration: 0.4, ease: 'power2.out' });
+      }
+    });
+  });
+</script>

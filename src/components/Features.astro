@@ -1,0 +1,127 @@
+---
+const features = [
+  {
+    title: 'No account needed',
+    body: 'Paste and download — no sign-up, no login, no tracking cookies.',
+  },
+  {
+    title: 'Four platforms',
+    body: 'YouTube, TikTok, Instagram, and Facebook all in one place.',
+  },
+  {
+    title: 'Direct download',
+    body: 'Links go straight to the source. Your browser handles the rest.',
+  },
+  {
+    title: 'Always free',
+    body: 'No paywalls, no premium tiers. Savely is and will stay free.',
+  },
+];
+---
+<section class="features">
+  <div class="container">
+    <div class="features-header">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything you need,<br />nothing you don't.</h2>
+    </div>
+    <ul class="features-grid">
+      {features.map(({ title, body }) => (
+        <li class="feature-card card">
+          <div class="feature-dot" aria-hidden="true"></div>
+          <h3 class="feature-title">{title}</h3>
+          <p class="feature-body">{body}</p>
+        </li>
+      ))}
+    </ul>
+    <div class="features-cta">
+      <a href="/download" class="btn-primary">Try it now</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding-block: 6rem;
+  }
+
+  .features-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: var(--font-body);
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .features-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: rgba(255, 140, 66, 0.35); }
+
+  .feature-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-orange);
+    opacity: 0.7;
+  }
+
+  .feature-title {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .feature-body {
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    line-height: 1.65;
+  }
+
+  .features-cta {
+    margin-top: 3rem;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.set('.feature-card', { opacity: 0, scale: 0.95 });
+  gsap.to('.feature-card', {
+    opacity: 1,
+    scale: 1,
+    duration: 0.65,
+    stagger: 0.12,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.features-grid',
+      start: 'top 78%',
+    },
+  });
+</script>
