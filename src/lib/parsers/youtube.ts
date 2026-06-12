@@ -69,12 +69,60 @@ async function tryYtdl(rawUrl: string): Promise<VideoResult | null> {
   }
 }
 
-/** Method 2: youtubei.js Innertube API — works when ytdl-core is blocked */
-async function tryInnertube(rawUrl: string): Promise<VideoResult | null> {
-  try {
-    const videoId = extractVideoId(rawUrl);
-    if (!videoId) return null;
+/** Pick best muxed (video+audio) mp4 format from a list, sorted by quality */
+function pickBestFormat(formats: Array<{ mime_type?: string; bitrate?: number }>): (typeof formats)[0] | null {
+  const mp4 = formats.filter((f) => f.mime_type?.startsWith('video/mp4'));
+  // streamingData.formats are muxed; adaptive_formats are separate video/audio
+  // Prefer higher bitrate
+  const sorted = mp4.sort((a, b) => (b.bitrate ?? 0) - (a.bitrate ?? 0));
+  return sorted[0] ?? formats.find((f) => f.mime_type?.startsWith('video/')) ?? null;
+}
 
+/** Method 2a: Innertube ANDROID client — returns direct URLs, no decipher needed */
+async function tryInnertubeAndroid(videoId: string): Promise<VideoResult | null> {
+  try {
+    const yt = await Innertube.create({
+      // ANDROID client gets direct streaming URLs — no JS eval/decipher required
+      retrieve_player: false,
+      generate_session_locally: true,
+      cache: new UniversalCache(false),
+    });
+
+    const info = await yt.getBasicInfo(videoId, 'ANDROID');
+    const title = info.basic_info.title ?? 'YouTube Video';
+    const thumbnail =
+      info.basic_info.thumbnail?.at(-1)?.url ?? info.basic_info.thumbnail?.[0]?.url;
+
+    const streamingData = info.streaming_data;
+    if (!streamingData) return null;
+
+    const allFormats = [
+      ...(streamingData.formats ?? []),
+      ...(streamingData.adaptive_formats ?? []),
+    ];
+    if (!allFormats.length) return null;
+
+    const best = pickBestFormat(allFormats);
+    if (!best) return null;
+
+    // ANDROID client URLs are plain — decipher is a no-op (no player needed)
+    const url = await (best as { decipher: (p: null) => Promise<string> }).decipher(null);
+    if (!url) return null;
+
+    const qualityLabel =
+      (best as unknown as { quality_label?: string }).quality_label ??
+      (best as unknown as { quality?: string }).quality ??
+      'HD';
+
+    return { title, url, quality: String(qualityLabel), platform: 'youtube', thumbnail };
+  } catch {
+    return null;
+  }
+}
+
+/** Method 2b: Innertube WEB client — needs vm-based JS eval for decipher */
+async function tryInnertubeWeb(videoId: string): Promise<VideoResult | null> {
+  try {
     const yt = await Innertube.create({
       retrieve_player: true,
       generate_session_locally: true,
@@ -84,31 +132,23 @@ async function tryInnertube(rawUrl: string): Promise<VideoResult | null> {
     const info = await yt.getBasicInfo(videoId, 'WEB');
     const title = info.basic_info.title ?? 'YouTube Video';
     const thumbnail =
-      info.basic_info.thumbnail?.at(-1)?.url ??
-      info.basic_info.thumbnail?.[0]?.url;
+      info.basic_info.thumbnail?.at(-1)?.url ?? info.basic_info.thumbnail?.[0]?.url;
 
     const streamingData = info.streaming_data;
     if (!streamingData) return null;
 
-    // Prefer adaptive (higher quality) then muxed (progressive with audio+video)
-    const formats = [
-      ...(streamingData.adaptive_formats ?? []),
+    const allFormats = [
       ...(streamingData.formats ?? []),
+      ...(streamingData.adaptive_formats ?? []),
     ];
+    if (!allFormats.length) return null;
 
-    // Find best mp4 format with both video+audio (muxed) first
-    const muxed = formats
-      .filter(
-        (f) =>
-          f.mime_type?.includes('video/mp4') &&
-          (f as unknown as { has_audio?: boolean }).has_audio !== false,
-      )
-      .sort((a, b) => (b.bitrate ?? 0) - (a.bitrate ?? 0));
-
-    const best = muxed[0] ?? formats[0];
+    const best = pickBestFormat(allFormats);
     if (!best) return null;
 
-    const url = await best.decipher(yt.session.player);
+    const url = await (best as { decipher: (p: unknown) => Promise<string> }).decipher(
+      yt.session.player,
+    );
     if (!url) return null;
 
     const qualityLabel =
@@ -123,11 +163,21 @@ async function tryInnertube(rawUrl: string): Promise<VideoResult | null> {
 }
 
 export async function parseYoutube(rawUrl: string): Promise<VideoResult> {
-  // Try ytdl-core first (faster), fall back to Innertube
-  const result = (await tryYtdl(rawUrl)) ?? (await tryInnertube(rawUrl));
+  const videoId = extractVideoId(rawUrl);
+  if (!videoId) {
+    throw new Error('Could not find a YouTube video ID in that URL.');
+  }
+
+  // Try methods in order — first success wins
+  const result =
+    (await tryYtdl(rawUrl)) ??
+    (await tryInnertubeAndroid(videoId)) ??
+    (await tryInnertubeWeb(videoId));
+
   if (result) return result;
+
   throw new Error(
-    'Could not extract YouTube video. The video may be age-restricted, private, or region-locked.',
+    'Could not extract this YouTube video. It may be age-restricted, private, or unavailable.',
   );
 }
 

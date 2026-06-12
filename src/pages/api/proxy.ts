@@ -1,8 +1,5 @@
 ﻿import type { APIRoute } from 'astro';
 import { isValidUrl } from '../../lib/detect.js';
-import { parseTiktok } from '../../lib/parsers/tiktok.js';
-import { parseInstagram } from '../../lib/parsers/instagram.js';
-import { parseFacebook } from '../../lib/parsers/facebook.js';
 
 /** Block requests to private/loopback ranges (SSRF prevention) */
 function isPrivateHostname(hostname: string): boolean {
@@ -63,42 +60,18 @@ const PLATFORM_FETCH_HEADERS: Record<string, Record<string, string>> = {
 };
 
 export const GET: APIRoute = async ({ url: reqUrl }) => {
-  const sourceUrl = reqUrl.searchParams.get('source');
+  const cdnUrl = reqUrl.searchParams.get('url');
   const platform = reqUrl.searchParams.get('platform') ?? 'tiktok';
   const filename = (reqUrl.searchParams.get('filename') ?? 'video')
     .replace(/[^a-zA-Z0-9._-]/g, '_')
     .slice(0, 80);
 
-  if (!sourceUrl) {
-    return new Response('Missing source parameter', { status: 400 });
+  if (!cdnUrl) {
+    return new Response('Missing url parameter', { status: 400 });
   }
 
-  if (!isValidUrl(sourceUrl)) {
-    return new Response('Invalid source URL', { status: 400 });
-  }
-
-  // Re-parse the ORIGINAL platform URL at download time — ensures we always
-  // get a fresh, non-expired CDN URL (TikTok URLs expire within seconds).
-  let cdnUrl: string;
-  try {
-    let result;
-    switch (platform) {
-      case 'tiktok':
-        result = await parseTiktok(sourceUrl);
-        break;
-      case 'instagram':
-        result = await parseInstagram(sourceUrl);
-        break;
-      case 'facebook':
-        result = await parseFacebook(sourceUrl);
-        break;
-      default:
-        return new Response('Unsupported platform for proxy', { status: 400 });
-    }
-    cdnUrl = result.url;
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Could not resolve video URL';
-    return new Response(msg, { status: 502 });
+  if (!isValidUrl(cdnUrl)) {
+    return new Response('Invalid URL', { status: 400 });
   }
 
   // Validate the resolved CDN URL — SSRF protection

@@ -70,9 +70,9 @@ export const POST: APIRoute = async ({ request }) => {
         break;
     }
 
-    // TikTok/Instagram/Facebook CDN URLs expire quickly.
-    // Pass the ORIGINAL source URL to /api/proxy so it re-parses at download time
-    // and always gets a fresh CDN URL.
+    // TikTok/Instagram/Facebook CDN URLs need to be fetched server-side
+    // (browser can't set the required Referer/headers for these CDNs).
+    // Pass the CDN URL directly to /api/proxy — it validates and streams it.
     if (platform !== 'youtube' && result!.url) {
       const slug = (result!.title ?? 'video')
         .replace(/[^a-zA-Z0-9\s-]/g, '')
@@ -80,7 +80,7 @@ export const POST: APIRoute = async ({ request }) => {
         .replace(/\s+/g, '-')
         .slice(0, 60) || 'video';
       result!.url =
-        `/api/proxy?source=${encodeURIComponent(rawUrl)}&platform=${platform}&filename=${encodeURIComponent(slug)}`;
+        `/api/proxy?url=${encodeURIComponent(result!.url)}&platform=${platform}&filename=${encodeURIComponent(slug)}`;
       result!.proxied = true;
     }
 
